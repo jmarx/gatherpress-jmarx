@@ -388,6 +388,12 @@ class Setup {
 		if ( ! $term_exists ) {
 			$result = wp_insert_term( $term, Venue::TAXONOMY );
 		}
+
+		$term = get_term_by("slug", "online", Venue::TAXONOMY);
+		$args['name'] = 'Online Event';
+		if ( "Online event" !==  $term->name ) {
+			wp_update_term( $term->term_id, Venue::TAXONOMY, $args );
+		}
 	}
 
 	/**
