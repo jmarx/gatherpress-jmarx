@@ -20,11 +20,35 @@ const VenueSelectorPanel = () => {
 	const venueTermId = useSelect(() =>
 		select('core/editor').getEditedPostAttribute('_gp_venue')
 	);
+
+	/** Ensure that only the in-person venue is set as state */
+	const allVenues = useSelect(() => {
+		return select('core').getEntityRecords('taxonomy', '_gp_venue', {
+			per_page: -1,
+			context: 'view',
+		});
+	}, []);
+	let onlineId;
+	if (allVenues) {
+		// eslint-disable-next-line array-callback-return
+		allVenues.map((venue) => {
+			if (venue.slug === 'online') {
+				onlineId = venue.id;
+			}
+		});
+	}
+
+	let inPersonVenueId;
+	if (onlineId) {
+		inPersonVenueId = venueTermId.filter((item) => item !== onlineId);
+	}
+
 	const venueTerm = useSelect(() =>
-		select('core').getEntityRecord('taxonomy', '_gp_venue', venueTermId)
+		select('core').getEntityRecord('taxonomy', '_gp_venue', inPersonVenueId)
 	);
+
 	const venueSlug = venueTerm?.slug.slice(1, venueTerm?.slug.length);
-	const venueValue = venueTermId + ':' + venueSlug;
+	const venueValue = inPersonVenueId + ':' + venueSlug;
 	useEffect(() => {
 		setVenue(String(venueValue) ?? '');
 		Broadcaster({
@@ -68,9 +92,7 @@ const VenueSelectorPanel = () => {
 		setVenue(value);
 		value = value.split(':');
 		const term = '' !== value[0] ? [value[0]] : [];
-		console.log(term);
 		editPost({ _gp_venue: term });
-		console.log('updated venue term id', venueTermId);
 		Broadcaster({
 			setVenueSlug: value[1],
 		});
