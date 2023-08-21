@@ -68,7 +68,9 @@ const VenueSelectorPanel = () => {
 		setVenue(value);
 		value = value.split(':');
 		const term = '' !== value[0] ? [value[0]] : [];
+		console.log(term);
 		editPost({ _gp_venue: term });
+		console.log('updated venue term id', venueTermId);
 		Broadcaster({
 			setVenueSlug: value[1],
 		});

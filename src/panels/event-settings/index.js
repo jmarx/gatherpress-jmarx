@@ -7,6 +7,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
 import {
+	CheckboxControl,
 	SelectControl,
 	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
 	__experimentalDivider as Divider,
@@ -25,6 +26,7 @@ import VenuePanel from '../../components/VenueSelector';
 
 const EventSettings = () => {
 	const [hasOnlineBlock, setHasOnlineBlock] = useState(false);
+	const [hasOnlineEvent, setHasOnlineEvent] = useState(false);
 	const { editPost } = useDispatch('core/editor');
 	const { removeBlock, insertBlock } = useDispatch('core/block-editor');
 	const allVenues = useSelect(() => {
@@ -69,14 +71,9 @@ const EventSettings = () => {
 
 	useEffect(() => {
 		if (currentOnlineEventBlocks.length > 0 && onlineId) {
-			setHasOnlineBlock(true);
-			editPost({ _gp_venue: [onlineId] });
-			removeBlock(venueClientId);
+			
 		} else {
-			setHasOnlineBlock(false);
-			if (venueTermId.includes(onlineId)) {
-				editPost({ _gp_venue: [] });
-			}
+
 		}
 	}, [currentOnlineEventBlocks]);
 
@@ -92,27 +89,24 @@ const EventSettings = () => {
 				<VStack spacing={2}>
 					<DateTimePanel />
 					<Divider />
-					{!hasOnlineBlock && <VenuePanel />}
+					<VenuePanel />
 				</VStack>
 
 				<div>
-					<SelectControl
+					<CheckboxControl
 						label={__('Online Event', 'gatherpress')}
-						value={hasOnlineBlock}
-						onChange={(newValue) => {
-							if (newValue === 'false') {
-								removeBlock(onlineClientId);
-							} else {
+						checked={hasOnlineEvent}
+						onChange={(value) => {
+							setHasOnlineEvent(value);
+							if (value === true) {
 								const newBlock = createBlock(
 									'gatherpress/online-event'
 								);
 								insertBlock(newBlock);
+							} else {
+								removeBlock(onlineClientId);
 							}
 						}}
-						options={[
-							{ label: 'Yes', value: true },
-							{ label: 'No', value: false },
-						]}
 					/>
 				</div>
 			</PluginDocumentSettingPanel>
