@@ -13,6 +13,44 @@ import { createBlock } from '@wordpress/blocks';
 import { Broadcaster } from '../helpers/broadcasting';
 
 const VenueSelectorPanel = () => {
+	// Two Approaches for updating taxonomy for a post using the gutenberg editor
+
+	//Approach #1 (perferred)
+	//editPost({ _gp_venue: [8] });
+	//console.log('edit post has been called. So we should now see test as the venue and not the WM');
+	//
+	// Approach #2 (workaround)
+	// apiFetch( {
+	// 	path: '/wp/v2/gp_event/85',
+	// 	method: 'POST',
+	// 	data: {
+	// 		title: 'Testing from REST API 6',
+	// 		_gp_venue: [7],
+	// 	},
+	// }).then((res) => {
+	// 	console.log(res._gp_venue);
+	// 	setVenue([7]);
+	// } );
+	// console.log('The api has been queried and we set the venue back to WM. So we should now see WM as the venue and not test');
+
+	/**
+	 * Approach #1 is obviously the right way and preferred approach.
+	 * But, we cannot pass an array of _gp_venue terms to editPost. Why?
+	 * That answer is a mystery
+	 * editPost({ _gp_venue: [1,2] }); does not work.
+	 * editPost({ gp_topic: [1,2] }); works with a different taxonomy. So it is something with _gp_venue
+	 *
+	 * Because of that anomoly I had investigate alternate ways to update a taxonomy term in a post
+	 * So we arrive at Approach #2, which is a straight call to the Core REST API
+	 * This approach if functional, but it only works when you do the call and refresh the page.
+	 * Obviously, that doesn't help us.
+	 *
+	 * This is where we are at.
+	 * Next steps.
+	 * Ideally we figure out what is wrong with _gp_venue.
+	 * Or, we fix the core REST API call so it is immediately reactive.
+	 */
+
 	const { insertBlock } = useDispatch('core/block-editor');
 	const [venue, setVenue] = useState('');
 	const editPost = useDispatch('core/editor').editPost;
