@@ -1,7 +1,9 @@
 /**
  * External dependencies.
  */
+import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * LeafletMap component for GatherPress.
@@ -20,18 +22,36 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
  * @return {JSX.Element} The rendered React component.
  */
 const LeafletMap = (props) => {
+	const [position, setPosition] = useState([0, 0]);
 	const { zoom, className, location, height } = props;
 	const style = { height };
+	//** this will all work once I get the state issue worked out */
+	useEffect(() => {
+		axios
+			.get(
+				`https://nominatim.openstreetmap.org/search?q=${location}&format=geojson`
+			)
+			.then((res) => {
+				console.log('useffect alldone', res);
+				setPosition([
+					res.data.features[0].geometry.coordinates[1],
+					res.data.features[0].geometry.coordinates[0],
+				]);
+				console.log('pos after UE', position);
+				console.log(res.data.features[0].geometry.coordinates[0]);
+			})
+			.catch((err) => {
+		console.log(err)
+			});
+	}, []);
 
 	//convert location to position here
-
-	const testPostition = [51.505, -0.09]; // test value
 
 	return (
 		<MapContainer
 			style={style}
 			className={className}
-			center={testPostition}
+			center={position}
 			zoom={zoom}
 			scrollWheelZoom={false}
 			height={height}
@@ -40,7 +60,7 @@ const LeafletMap = (props) => {
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 			/>
-			<Marker position={testPostition}>
+			<Marker position={position}>
 				<Popup>{location}</Popup>
 			</Marker>
 		</MapContainer>
