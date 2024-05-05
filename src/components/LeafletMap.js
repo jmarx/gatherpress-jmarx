@@ -25,6 +25,7 @@ const LeafletMap = (props) => {
 	const [position, setPosition] = useState([0, 0]);
 	const { zoom, className, location, height } = props;
 	const style = { height };
+	console.log('location on leaflet', location);
 	//** this will all work once I get the state issue worked out */
 	useEffect(() => {
 		axios
@@ -38,12 +39,12 @@ const LeafletMap = (props) => {
 					res.data.features[0].geometry.coordinates[0],
 				]);
 				console.log('pos after UE', position);
-				console.log(res.data.features[0].geometry.coordinates[0]);
+				console.log(res.data.features[0].geometry.coordinates[1], res.data.features[0].geometry.coordinates[0]);
 			})
 			.catch((err) => {
 		console.log(err)
 			});
-	}, []);
+	}, [position, location]);
 
 	//convert location to position here
 
