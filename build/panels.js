@@ -1092,6 +1092,9 @@ const VenueInformation = () => {
     editPost({
       meta
     });
+    editPost({
+      geo_latitude: 20.758014
+    });
   };
   let venueInformationMetaData = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => select('core/editor').getEditedPostAttribute('meta').gatherpress_venue_information);
   if (venueInformationMetaData) {

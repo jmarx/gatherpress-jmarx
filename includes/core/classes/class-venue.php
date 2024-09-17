@@ -179,16 +179,30 @@ class Venue {
 	 * @return void
 	 */
 	public function register_post_meta(): void {
+		$args = array(
+			'auth_callback'     => static function () {
+				return current_user_can( 'edit_posts' ); // @codeCoverageIgnore
+			},
+			'sanitize_callback' => 'sanitize_text_field',
+			'show_in_rest'      => true,
+			'single'            => true,
+			'type'              => 'string',
+		);
+
+		register_post_meta(
+			self::POST_TYPE,
+			'geo_latitude',
+			$args
+		);
+
+		register_post_meta(
+			self::POST_TYPE,
+			'geo_longiitude',
+			$args
+		);
+
 		$post_meta = array(
-			'gatherpress_venue_information' => array(
-				'auth_callback'     => static function () {
-					return current_user_can( 'edit_posts' ); // @codeCoverageIgnore
-				},
-				'sanitize_callback' => 'sanitize_text_field',
-				'show_in_rest'      => true,
-				'single'            => true,
-				'type'              => 'string',
-			),
+			'gatherpress_venue_information' => $args,
 		);
 
 		foreach ( $post_meta as $meta_key => $args ) {
